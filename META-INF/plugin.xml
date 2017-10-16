@@ -1,8 +1,8 @@
 <idea-plugin>
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>pl.mn.StructureGenerator</id>
+  <name>Change list structure generator</name>
+  <version>0.8</version>
+  <vendor email="minidmnv@gmail.com" url=".">Michal Nicinski</vendor>
 
   <description><![CDATA[
       Enter short description for your plugin here.<br>
@@ -26,6 +26,12 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+
+    <applicationConfigurable id="Settings.StructureGenerator"
+                             groupId="tools"
+                             nonDefaultProject="true"
+                             instance="pl.mn.ccsg.settings.StructureGeneratorSettings" />
+
   </extensions>
 
   <actions>
