@@ -30,7 +30,8 @@
 
   <actions>
     <action id="StructureGenerator.Generate" class="pl.mn.ccsg.GenerateStructureAction">
-      <add-to-group group-id="ToolsBasicGroup" />
+      <add-to-group group-id="ToolsBasicGroup" anchor="after" relative-to-action="GenerateJavadoc"/>
+      <add-to-group group-id="ChangesViewPopupMenu" />
     </action>
   </actions>
 
