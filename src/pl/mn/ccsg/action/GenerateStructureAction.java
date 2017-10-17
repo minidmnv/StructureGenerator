@@ -1,10 +1,10 @@
-package pl.mn.ccsg;
+package pl.mn.ccsg.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vcs.actions.VcsContextWrapper;
-import pl.mn.ccsg.configuration.GenerateStructureConfigurationDialog;
+import com.intellij.openapi.vcs.changes.patch.AutoMatchIterator;
+import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
 
@@ -20,14 +20,14 @@ public class GenerateStructureAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
 
-        GenerateStructureConfigurationDialog dialog =
-                new GenerateStructureConfigurationDialog(VcsContextWrapper.createCachedInstanceOn(event).getProject());
+        GenerateStructureDialog dialog =
+                GenerateStructureDialog.instance(VcsContextWrapper.createCachedInstanceOn(event).getProject());
         dialog.show();
 
         handleDialogAction(dialog);
     }
 
-    private void handleDialogAction(GenerateStructureConfigurationDialog dialog) {
+    private void handleDialogAction(GenerateStructureDialog dialog) {
         if (dialog.getExitCode() == OK_EXIT_CODE) {
 
             generateClassStructure("");
