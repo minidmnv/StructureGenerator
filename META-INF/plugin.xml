@@ -27,11 +27,6 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
 
-    <applicationConfigurable id="Settings.StructureGenerator"
-                             groupId="tools"
-                             nonDefaultProject="true"
-                             instance="pl.mn.ccsg.settings.StructureGeneratorSettings" />
-
   </extensions>
 
   <actions>

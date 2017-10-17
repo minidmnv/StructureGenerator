@@ -3,7 +3,10 @@ package pl.mn.ccsg;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vcs.actions.VcsContextWrapper;
 import com.intellij.openapi.vcs.changes.ChangeList;
+import pl.mn.ccsg.configuration.GenerateStructureConfigurationPanel;
 
 import java.util.Arrays;
 
@@ -21,12 +24,10 @@ public class GenerateStructureAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-        Project project = event.getRequiredData(PROJECT);
-        ChangeList[] changeLists = event.getRequiredData(CHANGE_LISTS);
 
-        System.out.println("No i teraz bede generowal struktury klas");
-        System.out.println(project);
-        Arrays.stream(changeLists).forEach(ChangeList::getName);
+        GenerateStructureConfigurationPanel generateStructureConfigurationPanel
+                = new GenerateStructureConfigurationPanel(VcsContextWrapper.createCachedInstanceOn(event).getProject());
+
     }
 
 }
