@@ -3,7 +3,6 @@ package pl.mn.ccsg.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vcs.actions.VcsContextWrapper;
-import com.intellij.openapi.vcs.changes.patch.AutoMatchIterator;
 import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
@@ -19,7 +18,6 @@ public class GenerateStructureAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-
         GenerateStructureDialog dialog =
                 GenerateStructureDialog.instance(VcsContextWrapper.createCachedInstanceOn(event).getProject());
         dialog.show();
@@ -35,7 +33,7 @@ public class GenerateStructureAction extends AnAction {
     }
 
     private void generateClassStructure(String patchName) {
-
+        //there is where magic happens
     }
 
 }
