@@ -1,62 +1,76 @@
 package pl.mn.ccsg.dialog;
 
 import com.intellij.openapi.project.Project;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 
-import java.io.File;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author minidmnv
  */
-public class GenerateStructurePanel extends JFXPanel {
+public class GenerateStructurePanel extends JPanel {
 
-    private Button directoryChooserButton;
-    private TextArea directoryTextArea;
-    private DirectoryChooser pathChooser;
+    private JButton directoryChooserButton;
+    private JTextField directoryTextArea;
+    private JFileChooser pathChooser;
     private final Project project;
+    private JLabel pathLabel;
 
     public GenerateStructurePanel(Project project) {
-        Platform.setImplicitExit(false);
         this.project = project;
     }
 
     public void init() {
         initComponents();
 
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(directoryTextArea, directoryChooserButton);
-
-        StackPane pane = new StackPane();
-        pane.getChildren().add(vBox);
-        Platform.runLater(() -> {
-            Stage stage = new Stage();
-            stage.setScene(new Scene(pane));
-            stage.show();
-        });
-
+        add(pathLabel);
+        add(directoryTextArea);
+        add(directoryChooserButton);
     }
 
     private void initComponents() {
-        directoryTextArea = new TextArea();
-        directoryChooserButton = new Button("...");
-        directoryChooserButton.setOnAction(directoryChooserAction);
+        pathLabel = new JLabel("Path:");
+        directoryTextArea = new JTextField(project.getBasePath(), 20);
+        directoryChooserButton = new JButton("...");
+        directoryChooserButton.setAction(directoryChooserAction);
     }
 
-    private EventHandler<ActionEvent> directoryChooserAction = event -> {
-        pathChooser = new DirectoryChooser();
-        File selectedDirectory = pathChooser.showDialog(null);
-        if (selectedDirectory != null) {
-            directoryTextArea.setText(selectedDirectory.getAbsolutePath());
+    private Action directoryChooserAction = new Action() {
+
+        @Override
+        public Object getValue(String key) {
+            return null;
+        }
+
+        @Override
+        public void putValue(String key, Object value) {
+
+        }
+
+        @Override
+        public void setEnabled(boolean b) {
+
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return false;
+        }
+
+        @Override
+        public void addPropertyChangeListener(PropertyChangeListener listener) {
+
+        }
+
+        @Override
+        public void removePropertyChangeListener(PropertyChangeListener listener) {
+
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
         }
     };
 

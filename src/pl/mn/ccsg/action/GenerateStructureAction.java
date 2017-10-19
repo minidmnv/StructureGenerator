@@ -27,7 +27,6 @@ public class GenerateStructureAction extends AnAction {
 
     private void handleDialogAction(GenerateStructureDialog dialog) {
         if (dialog.getExitCode() == OK_EXIT_CODE) {
-
             generateClassStructure("");
         }
     }

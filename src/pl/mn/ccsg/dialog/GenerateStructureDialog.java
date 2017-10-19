@@ -40,6 +40,6 @@ public class GenerateStructureDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        return null;
+        return panel;
     }
 }
