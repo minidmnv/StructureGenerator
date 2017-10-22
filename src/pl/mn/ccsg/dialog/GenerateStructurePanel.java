@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 
 /**
@@ -33,45 +34,13 @@ public class GenerateStructurePanel extends JPanel {
         pathLabel = new JLabel("Path:");
         directoryTextArea = new JTextField(project.getBasePath(), 20);
         directoryChooserButton = new JButton("...");
-        directoryChooserButton.setAction(directoryChooserAction);
+        directoryChooserButton.addActionListener(directoryChooserAction);
     }
 
-    private Action directoryChooserAction = new Action() {
+    private ActionListener directoryChooserAction = e -> openPathChooser();
 
-        @Override
-        public Object getValue(String key) {
-            return null;
-        }
+    private void openPathChooser() {
 
-        @Override
-        public void putValue(String key, Object value) {
-
-        }
-
-        @Override
-        public void setEnabled(boolean b) {
-
-        }
-
-        @Override
-        public boolean isEnabled() {
-            return false;
-        }
-
-        @Override
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
-
-        }
-
-        @Override
-        public void removePropertyChangeListener(PropertyChangeListener listener) {
-
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-        }
-    };
+    }
 
 }
