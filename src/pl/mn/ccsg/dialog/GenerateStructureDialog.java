@@ -12,13 +12,14 @@ import javax.swing.*;
 public class GenerateStructureDialog extends DialogWrapper {
 
     private GenerateStructurePanel panel;
-    private final Project currentProject;
+    private String chosenDirectory;
 
     protected GenerateStructureDialog(@Nullable Project project) {
         super(project);
 
-        this.currentProject = project;
-        this.panel = new GenerateStructurePanel(project);
+        this.panel = new GenerateStructurePanel(project, this);
+
+        chosenDirectory = project.getBasePath();
     }
 
 
@@ -42,4 +43,5 @@ public class GenerateStructureDialog extends DialogWrapper {
     protected JComponent createCenterPanel() {
         return panel;
     }
+
 }

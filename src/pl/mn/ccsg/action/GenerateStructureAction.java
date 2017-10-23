@@ -35,4 +35,6 @@ public class GenerateStructureAction extends AnAction {
         //there is where magic happens
     }
 
+
+
 }
