@@ -49,6 +49,8 @@ public class GenerateStructurePanel extends JPanel {
         }
     }
 
+
+
     public String getChosenPath() {
         return directoryTextArea.getText();
     }

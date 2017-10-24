@@ -44,4 +44,14 @@ public class GenerateStructureDialog extends DialogWrapper {
         return panel;
     }
 
+    @Override
+    protected void doOKAction() {
+        super.doOKAction();
+
+        chosenDirectory = panel.getChosenPath();
+    }
+
+    public String getChosenDirectory() {
+        return chosenDirectory;
+    }
 }

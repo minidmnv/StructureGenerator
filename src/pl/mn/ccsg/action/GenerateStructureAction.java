@@ -3,6 +3,7 @@ package pl.mn.ccsg.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vcs.actions.VcsContextWrapper;
+import pl.mn.ccsg.PathQualityAssurance;
 import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
@@ -27,7 +28,11 @@ public class GenerateStructureAction extends AnAction {
 
     private void handleDialogAction(GenerateStructureDialog dialog) {
         if (dialog.getExitCode() == OK_EXIT_CODE) {
-            generateClassStructure("");
+            String chosenDirectory = dialog.getChosenDirectory();
+
+            if (PathQualityAssurance.accept(chosenDirectory)) {
+                generateClassStructure(chosenDirectory);
+            }
         }
     }
 
