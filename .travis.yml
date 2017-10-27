@@ -1,5 +1,4 @@
 language: java
-rvm:
- - 2.2
- - jruby
- - rbx-2
+
+jdk:
+  - oraclejdk8
