@@ -13,15 +13,24 @@ import com.intellij.openapi.vcs.actions.VcsContextWrapper;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 import pl.mn.ccsg.PathQualityAssurance;
 import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
 
@@ -30,6 +39,7 @@ import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
  */
 public class GenerateStructureAction extends AnAction {
 
+    private static final String JAVA_FILE_EXTENSION = "java";
     private Project project;
     private String patchDirectory;
 
@@ -72,6 +82,43 @@ public class GenerateStructureAction extends AnAction {
     }
 
     private void processFile(VirtualFile file) {
+        if (JAVA_FILE_EXTENSION.equals(file.getExtension())) {
+            getAllClassFiles(file)
+                    .forEach(this::copyFileToGeneratedStructure);
+        } else {
+            copyFileToGeneratedStructure(file);
+        }
+
+    }
+
+    private Collection<VirtualFile> getAllClassFiles(VirtualFile file) {
+        String fileName = cutExtensionFromFile(file);
+        Predicate<Path> pathClassesForFile = p -> Pattern.matches(fileName + "\\$\\w.*", p.toFile().getName());
+        Predicate<Path> pathClassForFile = p -> fileName.concat(".class").equals(p.toFile().getName());
+
+        VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
+        String structure = getFilePackageStructure(file);
+        Set<VirtualFile> classFiles = new HashSet<>();
+
+        try (Stream<Path> files = Files.walk(Paths.get(outputPath.getPath().concat(structure)))) {
+            classFiles = files
+                    .filter(pathClassesForFile.or(pathClassForFile))
+                    .map(Path::toFile)
+                    .map(LocalFileSystem.getInstance()::findFileByIoFile)
+                    .collect(Collectors.toSet());
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        }
+
+        return classFiles;
+    }
+
+    private String cutExtensionFromFile(VirtualFile file) {
+        int indexOfExtension = file.getName().lastIndexOf(".");
+        return file.getName().substring(0, indexOfExtension);
+    }
+
+    private void copyFileToGeneratedStructure(VirtualFile file) {
         VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
         String structure = generateStructure(file);
 
@@ -103,18 +150,25 @@ public class GenerateStructureAction extends AnAction {
     }
 
     private String generateStructure(VirtualFile file) {
-        ModuleSettingsImpl moduleSettings = getModuleSettings(file);
-        Collection<File> sourceRoots = moduleSettings.getSourceRoots(false);
-
-        String path = sourceRoots.stream()
-                .map(rootFile -> rootFile.getPath().replaceAll("\\\\", "/"))
-                .filter(rootFilePath -> file.getPath().contains(rootFilePath))
-                .map(rootFilePath -> file.getParent().getPath().substring((rootFilePath.length())))
-                .findFirst().orElse("");
+        String path = getFilePackageStructure(file);
 
         new File(patchDirectory.concat(path)).mkdirs();
 
         return path;
+    }
+
+    @NotNull
+    private String getFilePackageStructure(VirtualFile file) {
+        ModuleSettingsImpl moduleSettings = getModuleSettings(file);
+        Collection<File> sourceRoots = moduleSettings.getSourceRoots(false);
+        sourceRoots.add(
+                new File(CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath().getPath()));
+
+        return sourceRoots.stream()
+                .map(rootFile -> rootFile.getPath().replaceAll("\\\\", "/"))
+                .filter(rootFilePath -> file.getPath().contains(rootFilePath))
+                .map(rootFilePath -> file.getParent().getPath().substring((rootFilePath.length())))
+                .findFirst().orElse("");
     }
 
 }
