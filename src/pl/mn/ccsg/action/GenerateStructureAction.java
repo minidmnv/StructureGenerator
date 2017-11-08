@@ -13,26 +13,13 @@ import com.intellij.openapi.vcs.actions.VcsContextWrapper;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
 import pl.mn.ccsg.PathQualityAssurance;
-import pl.mn.ccsg.action.copy.CopyStrategy;
 import pl.mn.ccsg.action.copy.CopyStrategyFactory;
 import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
 
@@ -41,7 +28,6 @@ import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
  */
 public class GenerateStructureAction extends AnAction {
 
-    private static final String JAVA_FILE_EXTENSION = "java";
     private Project project;
     private String patchDirectory;
 
@@ -64,12 +50,12 @@ public class GenerateStructureAction extends AnAction {
             String chosenDirectory = dialog.getChosenDirectory();
 
             if (PathQualityAssurance.accept(chosenDirectory)) {
-                generateClassStructure(chosenDirectory);
+                generatePatchStructure(chosenDirectory);
             }
         }
     }
 
-    private void generateClassStructure(String patchDirectory) {
+    private void generatePatchStructure(String patchDirectory) {
         this.patchDirectory = patchDirectory;
 
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
@@ -84,27 +70,11 @@ public class GenerateStructureAction extends AnAction {
     }
 
     private void processFile(VirtualFile file) {
-        CopyStrategy copyStrategy = CopyStrategyFactory.getCopyStrategy(file.getExtension());
+        generateStructure(file);
+        CopyStrategyFactory
+                .getCopyStrategy(file.getExtension())
+                .copy(file, patchDirectory);
 
-        if (copyStrategy != null) {
-            generateStructure(file);
-            copyStrategy.copy(file, patchDirectory);
-        } else {
-            copyFileToGeneratedStructure(file);
-        }
-
-    }
-
-    private void copyFileToGeneratedStructure(VirtualFile file) {
-        VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
-        String structure = generateStructure(file);
-
-        try {
-            Files.copy(Paths.get(outputPath.getPath().concat(structure).concat("\\\\").concat(file.getName())),
-                    Paths.get(patchDirectory.concat(structure).concat("\\\\").concat(file.getName())));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private ModuleSettingsImpl getModuleSettings(VirtualFile file) {

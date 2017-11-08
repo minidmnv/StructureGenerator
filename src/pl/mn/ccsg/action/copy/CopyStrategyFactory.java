@@ -9,16 +9,14 @@ public class CopyStrategyFactory {
 
     public static CopyStrategy getCopyStrategy(String extension) {
         if (extension == null) {
-            return null;
+            return new SimpleFileCopyStrategy();
         }
 
         switch (extension) {
             case JAVA_FILE_EXTENSION:
                 return new JavaCopyStrategy();
-            case "properties":
-                return null;
+            default:
+                return new SimpleFileCopyStrategy();
         }
-
-        throw new RuntimeException("No valid copy strategy for given extension: " + extension);
     }
 }

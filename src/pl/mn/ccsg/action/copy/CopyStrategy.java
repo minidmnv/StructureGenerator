@@ -11,6 +11,9 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 /**
@@ -62,4 +65,15 @@ public interface CopyStrategy {
         return null;
     }
 
+    default void copyFile(VirtualFile file, String patchDirectory) {
+        VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
+        String structure = getFilePackageStructure(file);
+
+        try {
+            Files.copy(Paths.get(outputPath.getPath().concat(structure).concat("\\\\").concat(file.getName())),
+                    Paths.get(patchDirectory.concat(structure).concat("\\\\").concat(file.getName())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

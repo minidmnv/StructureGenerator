@@ -27,18 +27,6 @@ public class JavaCopyStrategy implements CopyStrategy {
                 .forEach(file -> copyFile(file, patchDirectory));
     }
 
-    private void copyFile(VirtualFile file, String patchDirectory) {
-        VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
-        String structure = getFilePackageStructure(file);
-
-        try {
-            Files.copy(Paths.get(outputPath.getPath().concat(structure).concat("\\\\").concat(file.getName())),
-                    Paths.get(patchDirectory.concat(structure).concat("\\\\").concat(file.getName())));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private Collection<VirtualFile> getAllClassFiles(VirtualFile file) {
         String fileName = cutExtensionFromFile(file);
         Predicate<Path> pathClassesForFile = p -> Pattern.matches(fileName + "\\$\\w.*", p.toFile().getName());
