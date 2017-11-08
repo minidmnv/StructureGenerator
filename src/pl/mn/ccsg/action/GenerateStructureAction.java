@@ -17,6 +17,8 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import pl.mn.ccsg.PathQualityAssurance;
+import pl.mn.ccsg.action.copy.CopyStrategy;
+import pl.mn.ccsg.action.copy.CopyStrategyFactory;
 import pl.mn.ccsg.dialog.GenerateStructureDialog;
 
 import java.io.File;
@@ -82,40 +84,15 @@ public class GenerateStructureAction extends AnAction {
     }
 
     private void processFile(VirtualFile file) {
-        if (JAVA_FILE_EXTENSION.equals(file.getExtension())) {
-            getAllClassFiles(file)
-                    .forEach(this::copyFileToGeneratedStructure);
+        CopyStrategy copyStrategy = CopyStrategyFactory.getCopyStrategy(file.getExtension());
+
+        if (copyStrategy != null) {
+            generateStructure(file);
+            copyStrategy.copy(file, patchDirectory);
         } else {
             copyFileToGeneratedStructure(file);
         }
 
-    }
-
-    private Collection<VirtualFile> getAllClassFiles(VirtualFile file) {
-        String fileName = cutExtensionFromFile(file);
-        Predicate<Path> pathClassesForFile = p -> Pattern.matches(fileName + "\\$\\w.*", p.toFile().getName());
-        Predicate<Path> pathClassForFile = p -> fileName.concat(".class").equals(p.toFile().getName());
-
-        VirtualFile outputPath = CompilerModuleExtension.getInstance(getModule(file)).getCompilerOutputPath();
-        String structure = getFilePackageStructure(file);
-        Set<VirtualFile> classFiles = new HashSet<>();
-
-        try (Stream<Path> files = Files.walk(Paths.get(outputPath.getPath().concat(structure)))) {
-            classFiles = files
-                    .filter(pathClassesForFile.or(pathClassForFile))
-                    .map(Path::toFile)
-                    .map(LocalFileSystem.getInstance()::findFileByIoFile)
-                    .collect(Collectors.toSet());
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
-
-        return classFiles;
-    }
-
-    private String cutExtensionFromFile(VirtualFile file) {
-        int indexOfExtension = file.getName().lastIndexOf(".");
-        return file.getName().substring(0, indexOfExtension);
     }
 
     private void copyFileToGeneratedStructure(VirtualFile file) {
@@ -157,7 +134,6 @@ public class GenerateStructureAction extends AnAction {
         return path;
     }
 
-    @NotNull
     private String getFilePackageStructure(VirtualFile file) {
         ModuleSettingsImpl moduleSettings = getModuleSettings(file);
         Collection<File> sourceRoots = moduleSettings.getSourceRoots(false);
